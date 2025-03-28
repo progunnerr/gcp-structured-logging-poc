@@ -10,8 +10,8 @@ export class ItemsService {
     return this.items;
   }
 
-  findOne(id: string): Item {
-    return this.items.find(item => item.id === id);
+  findOne(id: string): Item | null {
+    return this.items.find(item => item.id === id) || null;
   }
 
   create(name: string, description?: string): Item {

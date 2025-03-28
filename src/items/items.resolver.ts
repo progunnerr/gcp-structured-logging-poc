@@ -12,7 +12,7 @@ export class ItemsResolver {
   }
 
   @Query(() => Item, { nullable: true })
-  item(@Args('id') id: string): Item {
+  item(@Args('id') id: string): Item | null {
     return this.itemsService.findOne(id);
   }
 
