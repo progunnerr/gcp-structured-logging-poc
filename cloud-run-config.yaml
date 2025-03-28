@@ -1,0 +1,19 @@
+# Cloud Run configuration for cost-effective deployment
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: gcp-structured-logging-poc
+spec:
+  template:
+    spec:
+      containers:
+      - image: gcr.io/YOUR_PROJECT_ID/gcp-structured-logging-poc
+        resources:
+          limits:
+            cpu: "1"
+            memory: "256Mi"
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: GCP_PROJECT_ID
+          value: "your-gcp-project-id"
