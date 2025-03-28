@@ -1,0 +1,5 @@
+runtime: nodejs20
+
+env_variables:
+  NODE_ENV: "production"
+  GCP_PROJECT_ID: "your-gcp-project-id"

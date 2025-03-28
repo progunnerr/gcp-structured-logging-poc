@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Item } from './models/item.model';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ItemsService {
+  private readonly logger = new Logger(ItemsService.name);
   private items: Item[] = [
     {
       id: 'ctd',
@@ -33,14 +34,21 @@ export class ItemsService {
   ];
 
   findAll(): Item[] {
+    this.logger.log('Finding all items');
     return this.items;
   }
 
   findOne(id: string): Item | null {
-    return this.items.find(item => item.id === id) || null;
+    this.logger.log(`Finding item with id: ${id}`);
+    const item = this.items.find(item => item.id === id) || null;
+    if (!item) {
+      this.logger.warn(`Item with id ${id} not found`);
+    }
+    return item;
   }
 
   create(name: string, description?: string): Item {
+    this.logger.log(`Creating new item with name: ${name}`);
     const newItem = {
       id: uuidv4(),
       name,
@@ -48,6 +56,7 @@ export class ItemsService {
     };
     
     this.items.push(newItem);
+    this.logger.log(`Item created with id: ${newItem.id}`);
     return newItem;
   }
 }
