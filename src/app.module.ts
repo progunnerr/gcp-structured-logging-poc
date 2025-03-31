@@ -68,9 +68,6 @@ import { LoggingService } from './logging/logging.service';
           },
         },
       ],
-      context: () => ({
-        startTime: Date.now(), // Track when the request started
-      }),
     }),
     ItemsModule,
     LoggingModule,

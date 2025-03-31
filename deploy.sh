@@ -35,6 +35,10 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/gcp-structured-logging-poc .
 
 # Deploy to Cloud Run
 echo "Deploying to Cloud Run..."
+# Get log level from command line argument or use default
+LOG_LEVEL=${1:-debug}
+echo "Using LOG_LEVEL=$LOG_LEVEL"
+
 gcloud run deploy gcp-structured-logging-poc \
   --image gcr.io/$PROJECT_ID/gcp-structured-logging-poc \
   --platform managed \
@@ -43,6 +47,7 @@ gcloud run deploy gcp-structured-logging-poc \
   --cpu 1 \
   --min-instances 0 \
   --max-instances 10 \
+  --set-env-vars="LOG_LEVEL=$LOG_LEVEL" \
   --allow-unauthenticated
 
 echo "Deployment complete!"
