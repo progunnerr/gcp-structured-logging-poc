@@ -28,12 +28,13 @@ import { LoggingService } from './logging/logging.service';
           async requestDidStart(requestContext) {
             const logger = new LoggingService();
             const { request } = requestContext;
+            const startTime = Date.now(); // Store start time in a local variable
             
             // Log the operation when it starts
             logger.log(
               `GraphQL ${request.operationName || 'anonymous'} operation started: ${
-                request.query?.substring(0, 200)
-              }${request.query?.length > 200 ? '...' : ''}`,
+                request.query ? request.query.substring(0, 200) + (request.query.length > 200 ? '...' : '') : 'No query'
+              }`,
               'GraphQL'
             );
             
@@ -51,13 +52,13 @@ import { LoggingService } from './logging/logging.service';
                   `GraphQL errors in ${request.operationName || 'anonymous'}: ${
                     JSON.stringify(ctx.errors)
                   }`,
-                  null,
+                  '', // Use empty string instead of null
                   'GraphQL'
                 );
               },
               // Log when the operation completes
-              async willSendResponse(ctx) {
-                const duration = Date.now() - requestContext.context.startTime;
+              async willSendResponse() {
+                const duration = Date.now() - startTime;
                 logger.log(
                   `GraphQL ${request.operationName || 'anonymous'} completed in ${duration}ms`,
                   'GraphQL'
