@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       containers:
-      - image: gcr.io/YOUR_PROJECT_ID/gcp-structured-logging-poc
+      - image: gcr.io/PROJECT_ID/gcp-structured-logging-poc
         resources:
           limits:
             cpu: "1"
@@ -16,4 +16,4 @@ spec:
         - name: NODE_ENV
           value: "production"
         - name: GCP_PROJECT_ID
-          value: "your-gcp-project-id"
+          value: "PROJECT_ID"
