@@ -21,7 +21,6 @@ echo "Using Google Cloud Project: $PROJECT_ID"
 
 # Replace placeholders in configuration files
 sed -i '' "s/PROJECT_ID/$PROJECT_ID/g" cloud-run-config.yaml
-sed -i '' "s/PROJECT_ID/$PROJECT_ID/g" app.yaml
 
 echo "Configuration files updated with project ID: $PROJECT_ID"
 
