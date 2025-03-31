@@ -12,6 +12,14 @@ import { ItemsModule } from './items/items.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
+      // Add these configurations to fix the CSRF issue
+      playground: {
+        settings: {
+          'request.credentials': 'same-origin',
+        },
+      },
+      // Disable CSRF protection for the GraphQL endpoint
+      csrfPrevention: false,
     }),
     ItemsModule,
   ],

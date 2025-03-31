@@ -1,0 +1,18 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Item {
+  description: String
+  id: ID!
+  name: String!
+}
+
+type Mutation {
+  createItem(description: String, name: String!): Item!
+}
+
+type Query {
+  item(id: String!): Item
+  items: [Item!]!
+}

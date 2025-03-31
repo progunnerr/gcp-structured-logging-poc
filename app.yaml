@@ -1,7 +1,0 @@
-# This file is for App Engine deployment
-# For cost-effective deployment, consider using Cloud Run instead
-runtime: nodejs20
-
-env_variables:
-  NODE_ENV: "production"
-  GCP_PROJECT_ID: "PROJECT_ID"
