@@ -12,9 +12,11 @@ export class LoggingService implements LoggerService {
       // When running in GCP, credentials are automatically detected
     });
 
+    const logLevel = process.env.LOG_LEVEL || 'info';
+
     // Create a Winston logger that streams to Stackdriver Logging
     this.logger = winston.createLogger({
-      level: 'info',
+      level: logLevel,
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
@@ -32,6 +34,9 @@ export class LoggingService implements LoggerService {
         loggingWinston,
       ],
     });
+
+    // Log the current logging level on startup
+    this.logger.info(`Logging initialized at level: ${logLevel}`);
   }
 
   log(message: string, context?: string) {

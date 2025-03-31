@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@google-cloud/logging-winston": "^6.0.0",
     "@nestjs/apollo": "^13.0.4",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
@@ -29,7 +30,8 @@
     "graphql": "^16.10.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
