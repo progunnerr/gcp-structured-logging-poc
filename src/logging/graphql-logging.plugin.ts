@@ -29,7 +29,7 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
     logger.log(`GraphQL operation started: ${operationName}`, 'GraphQL');
     
     return {
-      didEncounterErrors({ errors }) {
+      async didEncounterErrors({ errors }) {
         logger.error(
           `GraphQL operation failed: ${operationName}`,
           '',
@@ -37,7 +37,7 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
           { errors: errors.map(e => e.message).join(', ') }
         );
       },
-      willSendResponse() {
+      async willSendResponse() {
         const duration = Date.now() - startTime;
         logger.log(
           `GraphQL operation completed: ${operationName} (${duration}ms)`,
