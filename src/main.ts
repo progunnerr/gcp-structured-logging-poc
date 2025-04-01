@@ -8,14 +8,6 @@ async function bootstrap() {
     logger,
   });
   
-  // Add a middleware to extract correlation ID from HTTP requests
-  app.use((req, res, next) => {
-    if (req['correlationId']) {
-      logger.setCorrelationId(req['correlationId']);
-      logger.debug(`Request correlation ID set: ${req['correlationId']}`, 'Bootstrap');
-    }
-    next();
-  });
   
   const port = process.env.PORT ?? 3000;
   await app.listen(port);

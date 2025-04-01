@@ -6,7 +6,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ItemsModule } from './items/items.module';
 import { LoggingModule } from './logging/logging.module';
-import { LoggingService } from './logging/logging.service';
 import { v4 as uuidv4 } from 'uuid';
 import { CorrelationIdMiddleware } from './logging/correlation-id.middleware';
 

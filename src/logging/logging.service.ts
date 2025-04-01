@@ -78,7 +78,6 @@ export class LoggingService implements LoggerService {
   setCorrelationId(correlationId: string): this {
     if (correlationId) {
       this.correlationId = correlationId;
-      this.debug(`Correlation ID set: ${correlationId}`, 'LoggingService');
     }
     return this;
   }
