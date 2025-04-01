@@ -47,23 +47,36 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
     const operationName = request.operationName || 'anonymous';
     const startTime = Date.now();
     
-    this.loggingService.log(`GraphQL operation started: ${operationName}`, 'GraphQL');
+    // Check if logging service is available before using it
+    if (this.loggingService) {
+      this.loggingService.log(`GraphQL operation started: ${operationName}`, 'GraphQL');
+    } else {
+      console.log(`GraphQL operation started: ${operationName}`);
+    }
     
     return {
       async didEncounterErrors({ errors }) {
-        this.loggingService.error(
-          `GraphQL operation failed: ${operationName}`,
-          '',
-          'GraphQL',
-          { errors: errors.map(e => e.message).join(', ') }
-        );
+        if (this.loggingService) {
+          this.loggingService.error(
+            `GraphQL operation failed: ${operationName}`,
+            '',
+            'GraphQL',
+            { errors: errors.map(e => e.message).join(', ') }
+          );
+        } else {
+          console.error(`GraphQL operation failed: ${operationName}`, errors.map(e => e.message).join(', '));
+        }
       },
       async willSendResponse() {
         const duration = Date.now() - startTime;
-        this.loggingService.log(
-          `GraphQL operation completed: ${operationName} (${duration}ms)`,
-          'GraphQL'
-        );
+        if (this.loggingService) {
+          this.loggingService.log(
+            `GraphQL operation completed: ${operationName} (${duration}ms)`,
+            'GraphQL'
+          );
+        } else {
+          console.log(`GraphQL operation completed: ${operationName} (${duration}ms)`);
+        }
       }
     };
   }
