@@ -19,12 +19,6 @@ fi
 
 echo "Using Google Cloud Project: $PROJECT_ID"
 
-# Replace placeholders in configuration files if needed
-# Note: We're not replacing anything in cloud-run-config.yaml anymore
-# as we're using hardcoded values there
-
-echo "Configuration files updated with project ID: $PROJECT_ID"
-
 # Enable required APIs
 echo "Enabling required Google Cloud APIs..."
 gcloud services enable cloudbuild.googleapis.com
