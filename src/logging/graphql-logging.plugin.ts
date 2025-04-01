@@ -17,17 +17,31 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
       return {};
     }
 
-    // Extract correlation ID from various possible sources
-    const correlationId =
-      (request.http?.headers.get('x-correlation-id') as string) ||
-      (request.http?.headers.get('x-request-id') as string) ||
-      (context?.req?.headers?.['x-correlation-id']) ||
-      (context?.req?.headers?.['x-request-id']) ||
-      uuidv4();
+    // Extract correlation ID from request headers
+    let correlationId: string;
+    
+    if (request?.http?.headers) {
+      correlationId = 
+        (request.http.headers.get('x-correlation-id') as string) ||
+        (request.http.headers.get('x-request-id') as string) ||
+        uuidv4();
+    } else {
+      correlationId = uuidv4();
+      this.loggingService.warn('No request headers available for correlation ID', 'GraphQLPlugin');
+    }
 
-    // Set the correlation ID on the request object for other middleware/handlers
-    if (context?.req) {
-      context.req.correlationId = correlationId;
+    // Set the correlation ID on the context if available
+    if (context) {
+      if (!context.correlationId) {
+        context.correlationId = correlationId;
+      }
+      
+      // Also set on req object if it exists
+      if (context.req) {
+        context.req.correlationId = correlationId;
+      }
+    } else {
+      this.loggingService.warn('GraphQL context is undefined', 'GraphQLPlugin');
     }
     
     // Use the injected logging service instead of creating a new one
