@@ -23,6 +23,9 @@ export class CorrelationIdMiddleware implements NestMiddleware {
     // Set correlation ID on the logger instance
     this.logger.setCorrelationId(correlationId);
     
+    // Log that we've set the correlation ID
+    this.logger.debug(`Correlation ID set in middleware: ${correlationId}`, 'CorrelationIdMiddleware');
+    
     next();
   }
 }

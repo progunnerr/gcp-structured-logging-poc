@@ -78,6 +78,8 @@ export class LoggingService implements LoggerService {
   setCorrelationId(correlationId: string): this {
     if (correlationId) {
       this.correlationId = correlationId;
+      // Don't log here to avoid infinite recursion
+      console.log(`[LoggingService] Set correlationId: ${correlationId}`);
     }
     return this;
   }

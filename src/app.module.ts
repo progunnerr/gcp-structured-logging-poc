@@ -25,10 +25,13 @@ import { CorrelationIdMiddleware } from './logging/correlation-id.middleware';
       csrfPrevention: false,
       context: ({ req }) => {
         // Make sure we have access to the request object and its correlationId
+        const correlationId = req?.correlationId;
+        console.log('Setting GraphQL context correlationId:', correlationId); // Debug log
+        
         return { 
           req,
           // Extract correlation ID for GraphQL context
-          correlationId: req?.correlationId || null
+          correlationId
         };
       },
     }),

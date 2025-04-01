@@ -18,10 +18,27 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
 
     // Get correlation ID from context if available
     const correlationId = context?.correlationId || context?.req?.correlationId;
+    console.log('GraphQL plugin correlationId:', correlationId); // Debug log
+    
     const logger = new LoggingService();
     
     if (correlationId) {
       logger.setCorrelationId(correlationId);
+      logger.debug(`Using correlation ID in GraphQL plugin: ${correlationId}`, 'GraphQLPlugin');
+    } else {
+      logger.warn('No correlation ID found in GraphQL context', 'GraphQLPlugin');
+      
+      // Fallback: try to get it from the request headers directly
+      const reqHeaders = context?.req?.headers;
+      if (reqHeaders) {
+        const fallbackId = 
+          reqHeaders['x-correlation-id'] || 
+          reqHeaders['x-request-id'] || 
+          `fallback-${Date.now()}`;
+        
+        logger.setCorrelationId(fallbackId);
+        logger.debug(`Using fallback correlation ID: ${fallbackId}`, 'GraphQLPlugin');
+      }
     }
     
     const operationName = request.operationName || 'anonymous';
