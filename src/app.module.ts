@@ -6,8 +6,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ItemsModule } from './items/items.module';
 import { LoggingModule } from './logging/logging.module';
-import { v4 as uuidv4 } from 'uuid';
-import { CorrelationIdMiddleware } from './logging/correlation-id.middleware';
 
 @Module({
   imports: [
@@ -41,10 +39,4 @@ import { CorrelationIdMiddleware } from './logging/correlation-id.middleware';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(CorrelationIdMiddleware)
-      .forRoutes('*');
-  }
-}
+export class AppModule {}
