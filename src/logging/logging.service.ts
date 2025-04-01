@@ -1,6 +1,7 @@
 import { Injectable, LoggerService } from '@nestjs/common';
 import * as winston from 'winston';
 import { LoggingWinston } from '@google-cloud/logging-winston';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class LoggingService implements LoggerService {
@@ -59,8 +60,8 @@ export class LoggingService implements LoggerService {
     this.logger.verbose(message, { context });
   }
   
-  // Helper method to generate a request ID
+  // Helper method to generate a request ID using UUID
   static generateRequestId(): string {
-    return `req_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+    return uuidv4();
   }
 }

@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { ItemsModule } from './items/items.module';
 import { LoggingModule } from './logging/logging.module';
 import { LoggingService } from './logging/logging.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Module({
   imports: [
@@ -38,10 +39,10 @@ import { LoggingService } from './logging/logging.service';
               };
             }
             
-            // Get request ID from header or generate a new one
+            // Get request ID from header or generate a new UUID
             const requestId = 
               (context?.req?.headers['x-request-id'] as string) || 
-              `req_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+              uuidv4();
             
             const startTime = Date.now();
             const operationName = request.operationName || 'anonymous';
