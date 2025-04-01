@@ -30,7 +30,6 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
       uuidv4();
 
     // Set correlation ID in both services
-    this.loggingService.setCorrelationId(correlationId);
     this.correlationIdService.setCorrelationId(correlationId);
     
     // Set the correlation ID on the context if available

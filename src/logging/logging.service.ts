@@ -6,7 +6,6 @@ import { CorrelationIdService } from './correlation-id.service';
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggingService implements LoggerService {
   private logger: winston.Logger;
-  private correlationId: string | null = null;
 
   constructor(@Optional() private readonly correlationIdService?: CorrelationIdService) {
 
@@ -77,9 +76,8 @@ export class LoggingService implements LoggerService {
 
   // Set correlation ID for this logger instance
   setCorrelationId(correlationId: string): this {
-    if (correlationId) {
-      this.correlationId = correlationId;
-      // Don't log here to avoid infinite recursion
+    if (correlationId && this.correlationIdService) {
+      this.correlationIdService.setCorrelationId(correlationId);
       console.log(`[LoggingService] Set correlationId: ${correlationId}`);
     }
     return this;
@@ -87,7 +85,7 @@ export class LoggingService implements LoggerService {
 
   log(message: any, context?: string, meta: Record<string, any> = {}) {
     // Get correlation ID from service if available, fallback to instance property
-    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId();
     
     if (typeof message === 'object') {
       // For objects, use a single structured log entry
@@ -100,7 +98,7 @@ export class LoggingService implements LoggerService {
 
   error(message: any, trace?: string, context?: string, meta: Record<string, any> = {}) {
     // Get correlation ID from service if available, fallback to instance property
-    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId();
     
     const errorMeta = { 
       context, 
@@ -118,7 +116,7 @@ export class LoggingService implements LoggerService {
 
   warn(message: any, context?: string, meta: Record<string, any> = {}) {
     // Get correlation ID from service if available, fallback to instance property
-    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId();
     
     if (typeof message === 'object') {
       this.logger.warn({ context, data: message, correlationId, ...meta });
@@ -129,7 +127,7 @@ export class LoggingService implements LoggerService {
 
   debug(message: any, context?: string, meta: Record<string, any> = {}) {
     // Get correlation ID from service if available, fallback to instance property
-    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId();
     
     if (typeof message === 'object') {
       this.logger.debug({ context, data: message, correlationId, ...meta });
@@ -140,7 +138,7 @@ export class LoggingService implements LoggerService {
 
   verbose(message: any, context?: string, meta: Record<string, any> = {}) {
     // Get correlation ID from service if available, fallback to instance property
-    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId();
     
     if (typeof message === 'object') {
       this.logger.verbose({ context, data: message, correlationId, ...meta });
