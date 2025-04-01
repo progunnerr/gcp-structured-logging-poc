@@ -12,7 +12,7 @@ async function bootstrap() {
   app.use((req, res, next) => {
     if (req['correlationId']) {
       logger.setCorrelationId(req['correlationId']);
-      logger.debug('Request correlation ID set', 'Bootstrap');
+      logger.debug(`Request correlation ID set: ${req['correlationId']}`, 'Bootstrap');
     }
     next();
   });

@@ -25,7 +25,12 @@ import { CorrelationIdMiddleware } from './logging/correlation-id.middleware';
       // Disable CSRF protection for the GraphQL endpoint
       csrfPrevention: false,
       context: ({ req }) => {
-        return { req };
+        // Make sure we have access to the request object and its correlationId
+        return { 
+          req,
+          // Extract correlation ID for GraphQL context
+          correlationId: req['correlationId'] 
+        };
       },
     }),
     ItemsModule,

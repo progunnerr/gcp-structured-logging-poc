@@ -2,7 +2,7 @@ import { Injectable, LoggerService, Scope } from '@nestjs/common';
 import * as winston from 'winston';
 import { LoggingWinston } from '@google-cloud/logging-winston';
 
-@Injectable()
+@Injectable({ scope: Scope.TRANSIENT })
 export class LoggingService implements LoggerService {
   private logger: winston.Logger;
   private correlationId: string | null = null;
@@ -76,7 +76,10 @@ export class LoggingService implements LoggerService {
 
   // Set correlation ID for this logger instance
   setCorrelationId(correlationId: string): this {
-    this.correlationId = correlationId;
+    if (correlationId) {
+      this.correlationId = correlationId;
+      this.debug(`Correlation ID set: ${correlationId}`, 'LoggingService');
+    }
     return this;
   }
 
