@@ -17,43 +17,31 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
       return {};
     }
 
+    // Extract correlation ID from various possible sources
     const correlationId =
       (request.http?.headers.get('x-correlation-id') as string) ||
       (request.http?.headers.get('x-request-id') as string) ||
-      context?.req?.correlationId ||
+      (context?.req?.headers?.['x-correlation-id']) ||
+      (context?.req?.headers?.['x-request-id']) ||
       uuidv4();
 
-    console.log('GraphQL plugin correlationId:', correlationId); // Debug log
-    
-    const logger = new LoggingService();
-    
-    if (correlationId) {
-      logger.setCorrelationId(correlationId);
-      logger.debug(`Using correlation ID in GraphQL plugin: ${correlationId}`, 'GraphQLPlugin');
-    } else {
-      logger.warn('No correlation ID found in GraphQL context', 'GraphQLPlugin');
-      
-      // Fallback: try to get it from the request headers directly
-      const reqHeaders = context?.req?.headers;
-      if (reqHeaders) {
-        const fallbackId = 
-          reqHeaders['x-correlation-id'] || 
-          reqHeaders['x-request-id'] || 
-          `fallback-${Date.now()}`;
-        
-        logger.setCorrelationId(fallbackId);
-        logger.debug(`Using fallback correlation ID: ${fallbackId}`, 'GraphQLPlugin');
-      }
+    // Set the correlation ID on the request object for other middleware/handlers
+    if (context?.req) {
+      context.req.correlationId = correlationId;
     }
+    
+    // Use the injected logging service instead of creating a new one
+    this.loggingService.setCorrelationId(correlationId);
+    this.loggingService.debug(`GraphQL operation with correlation ID: ${correlationId}`, 'GraphQLPlugin');
     
     const operationName = request.operationName || 'anonymous';
     const startTime = Date.now();
     
-    logger.log(`GraphQL operation started: ${operationName}`, 'GraphQL');
+    this.loggingService.log(`GraphQL operation started: ${operationName}`, 'GraphQL');
     
     return {
       async didEncounterErrors({ errors }) {
-        logger.error(
+        this.loggingService.error(
           `GraphQL operation failed: ${operationName}`,
           '',
           'GraphQL',
@@ -62,7 +50,7 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
       },
       async willSendResponse() {
         const duration = Date.now() - startTime;
-        logger.log(
+        this.loggingService.log(
           `GraphQL operation completed: ${operationName} (${duration}ms)`,
           'GraphQL'
         );
