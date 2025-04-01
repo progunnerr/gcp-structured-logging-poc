@@ -28,7 +28,7 @@ import { CorrelationIdMiddleware } from './logging/correlation-id.middleware';
         return { 
           req,
           // Extract correlation ID for GraphQL context
-          correlationId: req['correlationId'] 
+          correlationId: req?.correlationId || null
         };
       },
     }),

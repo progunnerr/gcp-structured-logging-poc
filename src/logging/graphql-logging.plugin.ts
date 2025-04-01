@@ -9,14 +9,15 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
   constructor(private readonly loggingService: LoggingService) {}
 
   async requestDidStart({ request, context }): Promise<GraphQLRequestListener> {
-    // Skip introspection queries
-    if (request.operationName === 'IntrospectionQuery' || 
+    // Skip if no request or introspection queries
+    if (!request || 
+        request.operationName === 'IntrospectionQuery' || 
         (request.query && request.query.includes('__schema'))) {
       return {};
     }
 
-    // Get correlation ID from context
-    const correlationId = context.correlationId;
+    // Get correlation ID from context if available
+    const correlationId = context?.correlationId || context?.req?.correlationId;
     const logger = new LoggingService();
     
     if (correlationId) {
