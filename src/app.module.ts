@@ -22,15 +22,9 @@ import { LoggingModule } from './logging/logging.module';
       // Disable CSRF protection for the GraphQL endpoint
       csrfPrevention: false,
       context: ({ req }) => {
-        // Make sure we have access to the request object and its correlationId
-        const correlationId = req?.correlationId;
-        console.log('Setting GraphQL context correlationId:', correlationId); // Debug log
-        
-        return { 
-          req,
-          // Extract correlation ID for GraphQL context
-          correlationId
-        };
+        // We don't need to extract correlationId here as it will be set by the GraphQLLoggingPlugin
+        // Just pass the req object to the context
+        return { req };
       },
     }),
     ItemsModule,
