@@ -2,6 +2,7 @@ import { Plugin } from '@nestjs/apollo';
 import { ApolloServerPlugin, GraphQLRequestListener } from 'apollo-server-plugin-base';
 import { LoggingService } from './logging.service';
 import { Injectable } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 @Plugin()
@@ -16,8 +17,12 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
       return {};
     }
 
-    // Get correlation ID from context if available
-    const correlationId = context?.correlationId || context?.req?.correlationId;
+    const correlationId =
+      (request.http?.headers.get('x-correlation-id') as string) ||
+      (request.http?.headers.get('x-request-id') as string) ||
+      context?.req?.correlationId ||
+      uuidv4();
+
     console.log('GraphQL plugin correlationId:', correlationId); // Debug log
     
     const logger = new LoggingService();
