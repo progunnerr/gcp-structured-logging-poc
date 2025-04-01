@@ -27,41 +27,57 @@ import { LoggingService } from './logging/logging.service';
         {
           async requestDidStart(requestContext) {
             const logger = new LoggingService();
-            const { request } = requestContext;
-            const startTime = Date.now(); // Store start time in a local variable
+            const { request, context } = requestContext;
             
-            // Log the operation when it starts
-            logger.log(
-              `GraphQL ${request.operationName || 'anonymous'} operation started: ${
-                request.query ? request.query.substring(0, 200) + (request.query.length > 200 ? '...' : '') : 'No query'
-              }`,
-              'GraphQL'
-            );
-            
-            if (request.variables && Object.keys(request.variables).length > 0) {
-              logger.debug(
-                `Variables: ${JSON.stringify(request.variables)}`,
-                'GraphQL'
-              );
+            // Skip introspection queries completely
+            if (request.operationName === 'IntrospectionQuery' || 
+                (request.query && request.query.includes('__schema'))) {
+              return {
+                didEncounterErrors() {},
+                willSendResponse() {}
+              };
             }
             
+            // Get request ID from header or generate a new one
+            const requestId = 
+              (context?.req?.headers['x-request-id'] as string) || 
+              `req_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+            
+            const startTime = Date.now();
+            const operationName = request.operationName || 'anonymous';
+            
+            // Log operation start with request ID
+            logger.log(
+              `GraphQL operation started: ${operationName}`,
+              `GraphQL [${requestId}]`
+            );
+            
             return {
-              // Log any errors
+              // Log any errors with request ID
               async didEncounterErrors(ctx) {
+                const errorCount = ctx.errors?.length || 0;
                 logger.error(
-                  `GraphQL errors in ${request.operationName || 'anonymous'}: ${
-                    JSON.stringify(ctx.errors)
-                  }`,
-                  '', // Use empty string instead of null
-                  'GraphQL'
+                  `GraphQL operation failed: ${operationName} (${errorCount} errors)`,
+                  '', 
+                  `GraphQL [${requestId}]`
                 );
+                
+                // Log detailed errors at debug level
+                if (ctx.errors && ctx.errors.length > 0) {
+                  ctx.errors.forEach((err, index) => {
+                    logger.debug(
+                      `Error ${index + 1}: ${err.message}`,
+                      `GraphQL [${requestId}]`
+                    );
+                  });
+                }
               },
-              // Log when the operation completes
+              // Log operation completion with request ID
               async willSendResponse() {
                 const duration = Date.now() - startTime;
                 logger.log(
-                  `GraphQL ${request.operationName || 'anonymous'} completed in ${duration}ms`,
-                  'GraphQL'
+                  `GraphQL operation completed: ${operationName} (${duration}ms)`,
+                  `GraphQL [${requestId}]`
                 );
               },
             };

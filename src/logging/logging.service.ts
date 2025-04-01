@@ -58,4 +58,9 @@ export class LoggingService implements LoggerService {
   verbose(message: string, context?: string) {
     this.logger.verbose(message, { context });
   }
+  
+  // Helper method to generate a request ID
+  static generateRequestId(): string {
+    return `req_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+  }
 }
