@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
@@ -8,6 +8,7 @@ import { ItemsModule } from './items/items.module';
 import { LoggingModule } from './logging/logging.module';
 import { LoggingService } from './logging/logging.service';
 import { v4 as uuidv4 } from 'uuid';
+import { CorrelationIdMiddleware } from './logging/correlation-id.middleware';
 
 @Module({
   imports: [
@@ -23,6 +24,9 @@ import { v4 as uuidv4 } from 'uuid';
       },
       // Disable CSRF protection for the GraphQL endpoint
       csrfPrevention: false,
+      context: ({ req }) => {
+        return { req };
+      },
     }),
     ItemsModule,
     LoggingModule,
@@ -30,4 +34,10 @@ import { v4 as uuidv4 } from 'uuid';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(CorrelationIdMiddleware)
+      .forRoutes('*');
+  }
+}

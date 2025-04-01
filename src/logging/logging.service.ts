@@ -1,10 +1,11 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, LoggerService, Scope } from '@nestjs/common';
 import * as winston from 'winston';
 import { LoggingWinston } from '@google-cloud/logging-winston';
 
 @Injectable()
 export class LoggingService implements LoggerService {
   private logger: winston.Logger;
+  private correlationId: string | null = null;
 
   constructor() {
 
@@ -73,18 +74,29 @@ export class LoggingService implements LoggerService {
 
 // Fix logging methods to properly handle objects
 
+  // Set correlation ID for this logger instance
+  setCorrelationId(correlationId: string): this {
+    this.correlationId = correlationId;
+    return this;
+  }
+
   log(message: any, context?: string, meta: Record<string, any> = {}) {
     if (typeof message === 'object') {
       // For objects, use a single structured log entry
-      this.logger.info({ context, data: message, ...meta });
+      this.logger.info({ context, data: message, correlationId: this.correlationId, ...meta });
     } else {
       // For strings, use as message with metadata
-      this.logger.info({ message, context, ...meta });
+      this.logger.info({ message, context, correlationId: this.correlationId, ...meta });
     }
   }
 
   error(message: any, trace?: string, context?: string, meta: Record<string, any> = {}) {
-    const errorMeta = { context, ...(trace ? { stack: trace } : {}), ...meta };
+    const errorMeta = { 
+      context, 
+      correlationId: this.correlationId,
+      ...(trace ? { stack: trace } : {}), 
+      ...meta 
+    };
 
     if (typeof message === 'object') {
       this.logger.error({ data: message, ...errorMeta });
@@ -95,25 +107,25 @@ export class LoggingService implements LoggerService {
 
   warn(message: any, context?: string, meta: Record<string, any> = {}) {
     if (typeof message === 'object') {
-      this.logger.warn({ context, data: message, ...meta });
+      this.logger.warn({ context, data: message, correlationId: this.correlationId, ...meta });
     } else {
-      this.logger.warn({ message, context, ...meta });
+      this.logger.warn({ message, context, correlationId: this.correlationId, ...meta });
     }
   }
 
   debug(message: any, context?: string, meta: Record<string, any> = {}) {
     if (typeof message === 'object') {
-      this.logger.debug({ context, data: message, ...meta });
+      this.logger.debug({ context, data: message, correlationId: this.correlationId, ...meta });
     } else {
-      this.logger.debug({ message, context, ...meta });
+      this.logger.debug({ message, context, correlationId: this.correlationId, ...meta });
     }
   }
 
   verbose(message: any, context?: string, meta: Record<string, any> = {}) {
     if (typeof message === 'object') {
-      this.logger.verbose({ context, data: message, ...meta });
+      this.logger.verbose({ context, data: message, correlationId: this.correlationId, ...meta });
     } else {
-      this.logger.verbose({ message, context, ...meta });
+      this.logger.verbose({ message, context, correlationId: this.correlationId, ...meta });
     }
   }
 }
