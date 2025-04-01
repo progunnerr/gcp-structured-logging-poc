@@ -1,13 +1,14 @@
-import { Injectable, LoggerService, Scope } from '@nestjs/common';
+import { Injectable, LoggerService, Scope, Inject, Optional } from '@nestjs/common';
 import * as winston from 'winston';
 import { LoggingWinston } from '@google-cloud/logging-winston';
+import { CorrelationIdService } from './correlation-id.service';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggingService implements LoggerService {
   private logger: winston.Logger;
   private correlationId: string | null = null;
 
-  constructor() {
+  constructor(@Optional() private readonly correlationIdService?: CorrelationIdService) {
 
     const transports: winston.transport[] = [];
     
@@ -85,19 +86,25 @@ export class LoggingService implements LoggerService {
   }
 
   log(message: any, context?: string, meta: Record<string, any> = {}) {
+    // Get correlation ID from service if available, fallback to instance property
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    
     if (typeof message === 'object') {
       // For objects, use a single structured log entry
-      this.logger.info({ context, data: message, correlationId: this.correlationId, ...meta });
+      this.logger.info({ context, data: message, correlationId, ...meta });
     } else {
       // For strings, use as message with metadata
-      this.logger.info({ message, context, correlationId: this.correlationId, ...meta });
+      this.logger.info({ message, context, correlationId, ...meta });
     }
   }
 
   error(message: any, trace?: string, context?: string, meta: Record<string, any> = {}) {
+    // Get correlation ID from service if available, fallback to instance property
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    
     const errorMeta = { 
       context, 
-      correlationId: this.correlationId,
+      correlationId,
       ...(trace ? { stack: trace } : {}), 
       ...meta 
     };
@@ -110,26 +117,35 @@ export class LoggingService implements LoggerService {
   }
 
   warn(message: any, context?: string, meta: Record<string, any> = {}) {
+    // Get correlation ID from service if available, fallback to instance property
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    
     if (typeof message === 'object') {
-      this.logger.warn({ context, data: message, correlationId: this.correlationId, ...meta });
+      this.logger.warn({ context, data: message, correlationId, ...meta });
     } else {
-      this.logger.warn({ message, context, correlationId: this.correlationId, ...meta });
+      this.logger.warn({ message, context, correlationId, ...meta });
     }
   }
 
   debug(message: any, context?: string, meta: Record<string, any> = {}) {
+    // Get correlation ID from service if available, fallback to instance property
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    
     if (typeof message === 'object') {
-      this.logger.debug({ context, data: message, correlationId: this.correlationId, ...meta });
+      this.logger.debug({ context, data: message, correlationId, ...meta });
     } else {
-      this.logger.debug({ message, context, correlationId: this.correlationId, ...meta });
+      this.logger.debug({ message, context, correlationId, ...meta });
     }
   }
 
   verbose(message: any, context?: string, meta: Record<string, any> = {}) {
+    // Get correlation ID from service if available, fallback to instance property
+    const correlationId = this.correlationIdService?.getCurrentCorrelationId() || this.correlationId;
+    
     if (typeof message === 'object') {
-      this.logger.verbose({ context, data: message, correlationId: this.correlationId, ...meta });
+      this.logger.verbose({ context, data: message, correlationId, ...meta });
     } else {
-      this.logger.verbose({ message, context, correlationId: this.correlationId, ...meta });
+      this.logger.verbose({ message, context, correlationId, ...meta });
     }
   }
 }

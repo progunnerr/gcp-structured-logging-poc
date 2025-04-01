@@ -1,9 +1,13 @@
 import { Resolver, Query, Args, Context } from '@nestjs/graphql';
 import { LoggingService } from '../logging/logging.service';
+import { CorrelationIdService } from '../logging/correlation-id.service';
 
 @Resolver()
 export class GraphqlResolver {
-  constructor(private readonly logger: LoggingService) {}
+  constructor(
+    private readonly logger: LoggingService,
+    private readonly correlationIdService: CorrelationIdService
+  ) {}
 
   @Query(() => String)
   hello(): string {
