@@ -3,7 +3,7 @@ import * as winston from 'winston';
 import { LoggingWinston } from '@google-cloud/logging-winston';
 import { CorrelationIdService } from './correlation-id.service';
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable({ scope: Scope.DEFAULT })
 export class LoggingService implements LoggerService {
   private logger: winston.Logger;
 

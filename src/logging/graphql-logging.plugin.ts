@@ -14,8 +14,11 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
   ) {}
 
   async requestDidStart({ request, context }): Promise<GraphQLRequestListener> {
+    // Store a reference to this for use in callbacks
+    const self = this;
+
     // Skip if no request or introspection queries
-    if (!request || 
+    if (!request ||
         request.operationName === 'IntrospectionQuery' || 
         (request.query && request.query.includes('__schema'))) {
       return {};
@@ -25,8 +28,6 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
     const correlationId = 
       (request?.http?.headers?.get('x-correlation-id') as string) ||
       (request?.http?.headers?.get('x-request-id') as string) ||
-      (context?.req?.headers?.['x-correlation-id']) ||
-      (context?.req?.headers?.['x-request-id']) ||
       uuidv4();
 
     // Set correlation ID in both services
@@ -56,8 +57,8 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
     
     return {
       async didEncounterErrors({ errors }) {
-        if (this.loggingService) {
-          this.loggingService.error(
+        if (self.loggingService) {
+          self.loggingService.error(
             `GraphQL operation failed: ${operationName}`,
             '',
             'GraphQL',
@@ -69,8 +70,8 @@ export class GraphQLLoggingPlugin implements ApolloServerPlugin {
       },
       async willSendResponse() {
         const duration = Date.now() - startTime;
-        if (this.loggingService) {
-          this.loggingService.log(
+        if (self.loggingService) {
+          self.loggingService.log(
             `GraphQL operation completed: ${operationName} (${duration}ms)`,
             'GraphQL'
           );
