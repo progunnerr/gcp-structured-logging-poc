@@ -19,12 +19,6 @@ fi
 
 echo "Using Google Cloud Project: $PROJECT_ID"
 
-# Replace placeholders in configuration files
-sed -i '' "s/PROJECT_ID/$PROJECT_ID/g" cloud-run-config.yaml
-sed -i '' "s/PROJECT_ID/$PROJECT_ID/g" app.yaml
-
-echo "Configuration files updated with project ID: $PROJECT_ID"
-
 # Enable required APIs
 echo "Enabling required Google Cloud APIs..."
 gcloud services enable cloudbuild.googleapis.com
@@ -36,6 +30,11 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/gcp-structured-logging-poc .
 
 # Deploy to Cloud Run
 echo "Deploying to Cloud Run..."
+# Get log level from command line argument or use default
+LOG_LEVEL=${1:-debug}
+ENABLE_GCP_LOGGING=${2:-true}
+echo "Using LOG_LEVEL=$LOG_LEVEL, ENABLE_GCP_LOGGING=$ENABLE_GCP_LOGGING"
+
 gcloud run deploy gcp-structured-logging-poc \
   --image gcr.io/$PROJECT_ID/gcp-structured-logging-poc \
   --platform managed \
@@ -44,6 +43,7 @@ gcloud run deploy gcp-structured-logging-poc \
   --cpu 1 \
   --min-instances 0 \
   --max-instances 10 \
+  --set-env-vars="LOG_LEVEL=$LOG_LEVEL,ENABLE_GCP_LOGGING=$ENABLE_GCP_LOGGING" \
   --allow-unauthenticated
 
 echo "Deployment complete!"
